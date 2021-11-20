@@ -50,14 +50,18 @@ let urls = [
       await sheets.createSheet(product).then((res) => sheets.logData(product));
     }
   }
+
+  console.log("ENDED");
+  process.exit();
 })();
 
 async function compareAndLogData(product) {
   const latestVal = await sheets.getLatestPrice(product.item);
-  //TODO SHOW HOW MUCH TIME SINCE LAST PRICE
 
   const price = math.stringToN(product.price);
+
   if (!latestVal || latestVal.price == price) return;
+
   const difference = price - latestVal.price;
 
   // await notifyChange(latestVal, product);

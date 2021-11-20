@@ -1,5 +1,6 @@
-const puppeteer = require("puppeteer");
-let headless = true;
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
 
 module.exports = {
   getData
@@ -7,30 +8,40 @@ module.exports = {
 
 async function getData(url) {
   const browser = await puppeteer.launch({
-    headless,
+    headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
 
   const page = await browser.newPage();
+  // await page.setRequestInterception(true);
 
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, "platform", { get: () => "Win32" });
-    Object.defineProperty(navigator, "platform", { get: () => "20100101" });
-    Object.defineProperty(navigator, "vendor", { get: () => "" });
-    Object.defineProperty(navigator, "oscpu", {
-      get: () => "Windows NT 10.0; Win64; x64"
-    });
-  });
+  // page.on("request", (r) => {
+  //   if (
+  //     // ["image", "stylesheet", "font", "script"].indexOf(r.resourceType()) !== -1
+  //     ["script"].indexOf(r.resourceType()) !== -1
+  //   ) {
+  //     r.abort();
+  //   } else {
+  //     r.continue();
+  //   }
+  // });
 
-  await page.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0"
-  );
+  // await page.evaluateOnNewDocument(() => {
+  //   Object.defineProperty(navigator, "platform", { get: () => "Win32" });
+  //   Object.defineProperty(navigator, "platform", { get: () => "20100101" });
+  //   Object.defineProperty(navigator, "vendor", { get: () => "" });
+  //   Object.defineProperty(navigator, "oscpu", {
+  //     get: () => "Windows NT 10.0; Win64; x64"
+  //   });
+  // });
+
+  // await page.setUserAgent(
+  //   "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0"
+  // );
 
   const time = Date.now();
 
-  const content = await page
-    .goto(url, { timeout: 60000, waitUntil: "domcontentloaded" })
-    .then(() => page.content());
+  await page.goto(url, { timeout: 30000, waitUntil: "domcontentloaded" });
 
   await page.waitForSelector("#productTitle");
 
@@ -41,8 +52,6 @@ async function getData(url) {
       ?.innerText.substr(0, 40)
       .replaceAll(":", "");
   });
-
-  await page.waitForSelector("[data-feature-name=corePrice]");
 
   let price = await page.evaluate(() => {
     //review Considering utilizing only numeric values
@@ -74,6 +83,10 @@ async function getData(url) {
   });
 
   let product = { item, price, url, date: time };
+
+  const waitFor = Math.floor(Math.random() * 5000) + 5000;
+  console.log(`🕰️ Waiting for...${(waitFor / 1000).toFixed(0)}s`);
+  await page.waitForTimeout(waitFor);
 
   if (!product.price) throw Error(`- Couldn't find price for ${product.item}`);
 

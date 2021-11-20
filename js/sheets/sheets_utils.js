@@ -154,7 +154,7 @@ async function getLatestPrice(sheet_name) {
       const priceObj = { price: prices[last_index], time: times[last_index] };
       console.log(
         priceObj.price,
-        `at ${new Date(priceObj.time).toLocaleDateTimeString()}`
+        `at ${new Date(priceObj.time).toLocaleString()}`
       );
       console.groupEnd();
       return priceObj;
