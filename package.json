@@ -10,10 +10,16 @@
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-stealth": "^2.9.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.8",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  },
   "scripts": {
-    "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./dist/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --project ./ -w"
   },
   "author": "",
   "license": "ISC"
